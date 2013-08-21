@@ -170,6 +170,7 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
     [animation setDuration:duration];
     [animation setFromValue:[NSNumber numberWithDouble:start]];
     [animation setToValue:[NSNumber numberWithDouble:end]];
+    [animation setFillMode:kCAFillModeForwards];
     [animation setRemovedOnCompletion:NO];
     [jointLayer addAnimation:animation forKey:@"jointAnimation"];
     
@@ -178,6 +179,7 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
     [animation setDuration:duration];
     [animation setFromValue:[NSNumber numberWithDouble:(start)?shadowAniOpacity:0]];
     [animation setToValue:[NSNumber numberWithDouble:(start)?0:shadowAniOpacity]];
+    [animation setFillMode:kCAFillModeForwards];
     [animation setRemovedOnCompletion:NO];
     [shadowLayer addAnimation:animation forKey:nil];
     
@@ -227,6 +229,10 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
         anchorPoint = CGPointMake(0.5, 1);
     }
     
+    if ([view.layer.sublayers count]>3) {
+        [ view.layer.sublayers.lastObject removeFromSuperlayer    ];
+    }
+
     UIGraphicsBeginImageContext(view.frame.size);
     [view.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage *viewSnapShot = UIGraphicsGetImageFromCurrentImageContext();
@@ -251,12 +257,12 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
         CGRect imageFrame;
         if (direction == XYOrigamiDirectionFromRight) {
             if(b == 0)
-                startAngle = -M_PI_2;
+                startAngle = -M_PI_2+0.2;
             else {
                 if (b%2)
-                    startAngle = M_PI;
+                    startAngle = M_PI-0.2;
                 else
-                    startAngle = -M_PI;
+                    startAngle = -M_PI+0.2;
             }
             imageFrame = CGRectMake(frameWidth-(b+1)*foldWidth, 0, foldWidth, frameHeight);
         }
@@ -372,12 +378,12 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
         CGRect imageFrame;
         if (direction == XYOrigamiDirectionFromRight) {
             if(b == 0)
-                endAngle = -M_PI_2;
+                endAngle = -M_PI_2+0.2;
             else {
                 if (b%2)
-                    endAngle = M_PI;
+                    endAngle = M_PI-0.2;
                 else
-                    endAngle = -M_PI;
+                    endAngle = -M_PI+0.2;
             }
             imageFrame = CGRectMake(frameWidth-(b+1)*foldWidth, 0, foldWidth, frameHeight);
         }
@@ -422,7 +428,6 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
     [CATransaction begin];
     [CATransaction setCompletionBlock:^{
         self.frame = selfFrame;
-        [origamiLayer removeFromSuperlayer];
         XY_Origami_Current_State = XYOrigamiTransitionStateIdle;
         
 		if (completion)
